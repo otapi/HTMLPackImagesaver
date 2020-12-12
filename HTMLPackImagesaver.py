@@ -42,13 +42,34 @@ def Main():
 
 ### set up logging
 import logging, sys, socket
+import pyttsx3
+
+class TalkerHandler(logging.StreamHandler):
+    """
+    A handler class which talks the output
+    """
+    def __init__(self):
+        super().__init__()
+        self.engine = pyttsx3.init()
+        voices = self.engine.getProperty('voices')
+        self.engine.setProperty('voice', voices[1].id)
+
+    def emit(self, record):
+        try:
+            msg = self.format(record).split("\t")[0]
+            self.engine.say(msg)
+            self.engine.runAndWait()
+        except:
+            self.handleError(record)
+
 machinename = socket.gethostname()
 logging.basicConfig(
     level=logging.INFO,
     format=f"%(message)s\t%(asctime)s\t{machinename}\t%(threadName)s\t%(levelname)s",
     handlers=[
         #logging.FileHandler(f"{logfile}.txt"),
-        logging.StreamHandler(sys.stdout)
+        logging.StreamHandler(sys.stdout),
+        TalkerHandler()
     ]
 )
 
