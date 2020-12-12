@@ -1,21 +1,44 @@
 import tkinter as tk
 from tkinter import filedialog
 import os.path
-
+import tempfile
+import zipfile
 """
 Requirements: Python 3.8+
 python -m pip install tkinter
 """
+def zipdir(path, ziph):
+    # ziph is zipfile handle
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            filepath = os.path.join(root, file)
+            ziph.write(filename=filepath, arcname=filepath.replace(path, ""))
 
 def Main():
     print("Download and save images back into the zip of Medium.com backup zip file.")
     root = tk.Tk()
     root.withdraw()
-    zipfile = filedialog.askopenfilename(title = "Select the Medium.com backup zip file",filetypes = (("zip files","*.zip"),("all files","*.*")))
-    if not os.path.isfile(zipfile):
+    zipfilename = filedialog.askopenfilename(title = "Select the Medium.com backup zip file",filetypes = (("zip files","*.zip"),("all files","*.*")))
+    if not os.path.isfile(zipfilename):
         logging.error("No valid file selected")
         raise Exception() 
     logging.info(f"Selected zip: {zipfile}")
+
+    with tempfile.TemporaryDirectory() as tempdir:
+        logging.info(f"Tempdir: {tempdir}")
+
+        with zipfile.ZipFile(zipfilename, 'r') as zipf:
+            logging.info(f"Unzip: {zipfilename}")
+            zipf.extractall(tempdir)
+        
+        outfile = zipfilename+"2.zip"
+        if os.path.isfile(outfile):
+            logging.info(f"Delete existing file: {outfile}")
+            os.remove(outfile)
+            
+        with zipfile.ZipFile(outfile, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            logging.info(f"Compress files to zip")
+            zipdir(tempdir, zipf)
 
 ### set up logging
 import logging, sys, socket
