@@ -74,7 +74,7 @@ def Main():
                             file.write(str(soup))
                     
 
-        outfile = zipfilename+"2.zip"
+        outfile = zipfilename
         if os.path.isfile(outfile):
             logging.info(f"Delete existing file: {outfile}")
             os.remove(outfile)
