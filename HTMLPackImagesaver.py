@@ -4,6 +4,8 @@ import os.path
 import tempfile
 import zipfile
 from bs4 import BeautifulSoup
+import requests
+import re
 """
 Requirements: Python 3.8+
 python -m pip install tkinter pyttsx3 html5lib
@@ -14,6 +16,19 @@ def zipdir(path, ziph):
         for file in files:
             filepath = os.path.join(root, file)
             ziph.write(filename=filepath, arcname=filepath.replace(path, ""))
+
+def downloadImage(url, directory):
+    # download image from url to the specified directory. Also creates directory if not exists
+    # returns the filename
+    filename = re.sub('[^\w\-_\. ]', '_', url.split('/')[-1])
+    
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    filepath = os.path.join(directory, filename)
+    r = requests.get(url, allow_redirects=True)
+    open(filepath, 'wb').write(r.content)
+    return filename
+
 
 def Main():
     print("Download and save images back into the zip of Medium.com backup zip file.")
@@ -35,8 +50,9 @@ def Main():
         for root, dirs, files in os.walk(tempdir):
             for file in files:
                 filepath = os.path.join(root, file)
+                filedir = os.path.dirname(filepath)
                 logging.info(f"Search images in {file}")
-
+                
                 soup = None
                 with open(filepath, "rb") as f:
                     try:
@@ -48,7 +64,8 @@ def Main():
                     imgfound = False
                     links = soup.find_all('img')
                     for i in links:
-                        print(i['src'])
+                        imgfilename = downloadImage(i['src'], os.path.join(filedir, "images"))
+                        i['src'] = os.path.join("images", imgfilename)
                         imgfound = True
 
                     if imgfound:
@@ -100,10 +117,6 @@ logging.basicConfig(
     ]
 )
 
-### doctest
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
 
 # main run
 try:
