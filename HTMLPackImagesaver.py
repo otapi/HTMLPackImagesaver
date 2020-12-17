@@ -3,9 +3,10 @@ from tkinter import filedialog
 import os.path
 import tempfile
 import zipfile
+from bs4 import BeautifulSoup
 """
 Requirements: Python 3.8+
-python -m pip install tkinter
+python -m pip install tkinter pyttsx3 html5lib
 """
 def zipdir(path, ziph):
     # ziph is zipfile handle
@@ -31,6 +32,31 @@ def Main():
             logging.info(f"Unzip: {zipfilename}")
             zipf.extractall(tempdir)
         
+        for root, dirs, files in os.walk(tempdir):
+            for file in files:
+                filepath = os.path.join(root, file)
+                logging.info(f"Search images in {file}")
+
+                soup = None
+                with open(filepath, "rb") as f:
+                    try:
+                        soup = BeautifulSoup(f, "html5lib")
+                    except:
+                        logging.debug(f"This is not a html file: {file}")
+                
+                if soup:
+                    imgfound = False
+                    links = soup.find_all('img')
+                    for i in links:
+                        print(i['src'])
+                        imgfound = True
+
+                    if imgfound:
+                        logging.info("Saving changes...")
+                        with open(filepath, "w", encoding="utf-8") as file:
+                            file.write(str(soup))
+                    
+
         outfile = zipfilename+"2.zip"
         if os.path.isfile(outfile):
             logging.info(f"Delete existing file: {outfile}")
@@ -46,7 +72,7 @@ import pyttsx3
 
 class TalkerHandler(logging.StreamHandler):
     """
-    A handler class which talks the output
+    A logging handler class which talks the output
     """
     def __init__(self):
         super().__init__()
@@ -65,11 +91,12 @@ class TalkerHandler(logging.StreamHandler):
 machinename = socket.gethostname()
 logging.basicConfig(
     level=logging.INFO,
-    format=f"%(message)s\t%(asctime)s\t{machinename}\t%(threadName)s\t%(levelname)s",
+    #format=f"%(message)s\t%(asctime)s\t{machinename}\t%(threadName)s\t%(levelname)s",
+    format=f"%(message)s",
     handlers=[
         #logging.FileHandler(f"{logfile}.txt"),
-        logging.StreamHandler(sys.stdout),
-        TalkerHandler()
+        logging.StreamHandler(sys.stdout)
+        #TalkerHandler()
     ]
 )
 
