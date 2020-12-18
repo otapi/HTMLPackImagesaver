@@ -32,12 +32,27 @@ def downloadImage(url, directory):
 
 def Main():
     print("Download and save images back into the zip of Medium.com backup zip file.")
-    root = tk.Tk()
-    root.withdraw()
-    zipfilename = filedialog.askopenfilename(title = "Select the Medium.com backup zip file",filetypes = (("zip files","*.zip"),("all files","*.*")))
-    if not os.path.isfile(zipfilename):
-        logging.error("No valid file selected")
-        raise Exception() 
+    HTMLArchive = None
+    if len(sys.argv)>1:
+        HTMLArchive = sys.argv[1]
+        if not os.path.isfile(HTMLArchive):
+            logging.error(f"The specified HTML Archive file is not exists: {HTMLArchive}")
+            raise Exception() 
+    
+    if HTMLArchive:
+        zipfilename = HTMLArchive
+    else:
+        print("Usage:")
+        print("   HTMLPackImagesaver.py [HTMLArchive]")
+        print("      HTMLArchive: path to a zipped HTML archive file. Opens a file selector dialog if missing.")
+
+        root = tk.Tk()
+        root.withdraw()
+        zipfilename = filedialog.askopenfilename(title = "Select the Medium.com backup zip file",filetypes = (("zip files","*.zip"),("all files","*.*")))
+        if not os.path.isfile(zipfilename):
+            logging.error("No valid file selected")
+            raise Exception() 
+
     logging.info(f"Selected zip: {zipfile}")
 
     with tempfile.TemporaryDirectory() as tempdir:
