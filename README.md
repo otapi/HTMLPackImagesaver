@@ -6,4 +6,5 @@ Download and save images of HTML only archives - e.g. backup package of Medium.c
 
 ## Usage
 `python -m HTMLPackImagesaver [HTMLArchive]`
-   `HTMLArchive: path to a zipped HTML archive file. Opens a file selector dialog if missing.`
+
+`HTMLArchive: path to a zipped HTML archive file. Opens a file selector dialog if missing.`
