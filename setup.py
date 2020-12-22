@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="HTMLPackImagesaver",
-    version="1.0.1",
+    version="1.0.2",
     author="otapi",
     description="Download and save images of HTML only archives - e.g. backup package of Medium.com",
     long_description=long_description,
