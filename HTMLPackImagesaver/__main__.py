@@ -6,10 +6,7 @@ import zipfile
 from bs4 import BeautifulSoup
 import requests
 import re
-"""
-Requirements: Python 3.8+
-python -m pip install tkinter pyttsx3 html5lib
-"""
+
 def zipdir(path, ziph):
     # ziph is zipfile handle
     for root, dirs, files in os.walk(path):
@@ -100,25 +97,6 @@ def Main():
 
 ### set up logging
 import logging, sys, socket
-import pyttsx3
-
-class TalkerHandler(logging.StreamHandler):
-    """
-    A logging handler class which talks the output
-    """
-    def __init__(self):
-        super().__init__()
-        self.engine = pyttsx3.init()
-        voices = self.engine.getProperty('voices')
-        self.engine.setProperty('voice', voices[1].id)
-
-    def emit(self, record):
-        try:
-            msg = self.format(record).split("\t")[0]
-            self.engine.say(msg)
-            self.engine.runAndWait()
-        except:
-            self.handleError(record)
 
 machinename = socket.gethostname()
 logging.basicConfig(
